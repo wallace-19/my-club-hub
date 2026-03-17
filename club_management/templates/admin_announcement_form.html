@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if action == 'edit' else 'New' }} Announcement{% endblock %}
+{% block page_title %}{{ 'Edit' if action == 'edit' else 'New' }} Announcement{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">{{ 'Edit Announcement' if action == 'edit' else 'New Announcement' }}</h1>
+  </div>
+  <a href="{{ url_for('admin_announcements') }}" class="btn btn-secondary">
+    <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back
+  </a>
+</div>
+
+<div class="card" style="max-width:680px">
+  <form method="POST">
+    <div class="form-group">
+      <label class="form-label" for="title">Title *</label>
+      <input type="text" name="title" id="title" class="form-control" required
+             value="{{ announcement.title if announcement else '' }}"
+             placeholder="Important Club Update">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="content">Content *</label>
+      <textarea name="content" id="content" class="form-control" rows="6" required
+                placeholder="Write your announcement here…">{{ announcement.content if announcement else '' }}</textarea>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="priority">Priority</label>
+        <select name="priority" id="priority" class="form-control">
+          <option value="low"    {% if announcement and announcement.priority == 'low' %}selected{% endif %}>Low</option>
+          <option value="medium" {% if not announcement or announcement.priority == 'medium' %}selected{% endif %}>Medium</option>
+          <option value="high"   {% if announcement and announcement.priority == 'high' %}selected{% endif %}>High</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="expires_at">Expiry Date</label>
+        <input type="date" name="expires_at" id="expires_at" class="form-control"
+               value="{{ announcement.expires_at if announcement and announcement.expires_at else '' }}">
+        <p class="form-hint">Leave blank for no expiry</p>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button type="submit" class="btn btn-primary">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        {{ 'Update' if action == 'edit' else 'Post Announcement' }}
+      </button>
+      <a href="{{ url_for('admin_announcements') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">My Profile</h1>
+    <p class="section-subtitle">Manage your account information</p>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start">
+  <!-- Profile Card -->
+  <div class="card" style="text-align:center">
+    <div class="member-avatar-lg" style="margin:0 auto 16px;width:72px;height:72px;font-size:30px">
+      {{ member.name[0].upper() if member else 'M' }}
+    </div>
+    <div style="font-family:var(--font-display);font-size:20px;font-weight:600">{{ member.name if member else '' }}</div>
+    <div class="text-muted text-sm" style="margin-top:4px">{{ member.email if member else '' }}</div>
+    <div style="margin-top:12px">
+      <span class="badge badge-active">Active Member</span>
+    </div>
+    {% if member %}
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);text-align:left">
+      <div style="font-size:12px;font-family:var(--font-mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Details</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="text-sm">
+          <span class="text-muted">Phone: </span>
+          <span>{{ member.phone or '—' }}</span>
+        </div>
+        <div class="text-sm">
+          <span class="text-muted">Affiliation: </span>
+          <span class="text-gold">{{ member.club_affiliation or 'General' }}</span>
+        </div>
+        <div class="text-sm">
+          <span class="text-muted">Member since: </span>
+          <span>{{ member.joined_at.strftime('%b %Y') if member.joined_at else '—' }}</span>
+        </div>
+      </div>
+    </div>
+    {% if member.profile_bio %}
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);text-align:left">
+      <div style="font-size:12px;font-family:var(--font-mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Bio</div>
+      <div class="text-sm text-muted">{{ member.profile_bio }}</div>
+    </div>
+    {% endif %}
+    {% endif %}
+  </div>
+
+  <!-- Edit Form -->
+  <div class="card">
+    <div class="card-header" style="margin-bottom:24px">
+      <div class="card-title">Edit Information</div>
+    </div>
+    <form method="POST">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name</label>
+          <input type="text" name="name" id="name" class="form-control" required
+                 value="{{ member.name if member else '' }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" value="{{ member.email if member else '' }}" disabled
+                 style="opacity:.5;cursor:not-allowed">
+          <p class="form-hint">Email cannot be changed. Contact admin.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number</label>
+          <input type="tel" name="phone" id="phone" class="form-control"
+                 value="{{ member.phone if member else '' }}" placeholder="+1 555-000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="club_affiliation">Club Affiliation</label>
+          <select name="club_affiliation" id="club_affiliation" class="form-control">
+            {% for aff in ['General','Technology','Arts','Sports','Science','Music','Literature','Business'] %}
+            <option value="{{ aff }}" {% if member and member.club_affiliation == aff %}selected{% endif %}>{{ aff }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="profile_bio">Bio</label>
+        <textarea name="profile_bio" id="profile_bio" class="form-control" rows="3"
+                  placeholder="Tell us a bit about yourself…">{{ member.profile_bio if member and member.profile_bio else '' }}</textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Changes
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

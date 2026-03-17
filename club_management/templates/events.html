@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Events{% endblock %}
+{% block page_title %}Events{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">Club Events</h1>
+    <p class="section-subtitle">Browse and register for upcoming events</p>
+  </div>
+</div>
+
+{% if events %}
+<div class="events-grid">
+  {% for e in events %}
+  {% set is_past = e.event_date and e.event_date.strftime('%Y-%m-%d') < now if false else false %}
+  <div class="event-card">
+    <div class="event-card-top">
+      <div class="event-date-badge">
+        <div class="event-date-day">{{ e.event_date.strftime('%d') if e.event_date else '—' }}</div>
+        <div class="event-date-month">{{ e.event_date.strftime('%b %Y') if e.event_date else '' }}</div>
+      </div>
+      <span class="badge badge-medium">{{ e.category }}</span>
+    </div>
+    <div class="event-card-body">
+      <div class="event-title">{{ e.title }}</div>
+      {% if e.description %}
+      <div class="text-muted text-sm" style="margin-bottom:10px;line-height:1.5">
+        {{ e.description[:100] }}{% if e.description|length > 100 %}…{% endif %}
+      </div>
+      {% endif %}
+      <div class="event-meta">
+        {% if e.location %}
+        <div class="event-meta-item">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          {{ e.location }}
+        </div>
+        {% endif %}
+        {% if e.event_time %}
+        <div class="event-meta-item">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          {{ e.event_time|format_time }}
+        </div>
+        {% endif %}
+        <div class="event-meta-item">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+          {{ e.registered_count }}{% if e.max_attendees %}/{{ e.max_attendees }}{% endif %} registered
+        </div>
+      </div>
+
+      {% if e.is_registered %}
+      <form method="POST" action="{{ url_for('unregister_event', event_id=e.id) }}">
+        <button type="submit" class="btn btn-secondary btn-sm" style="width:100%;justify-content:center">
+          ✓ Registered — Unregister
+        </button>
+      </form>
+      {% elif e.max_attendees and e.registered_count >= e.max_attendees %}
+      <div class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;opacity:.5;cursor:not-allowed">
+        Event Full
+      </div>
+      {% else %}
+      <form method="POST" action="{{ url_for('register_event', event_id=e.id) }}">
+        <button type="submit" class="btn btn-primary btn-sm" style="width:100%;justify-content:center">
+          Register →
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="empty-state-icon">📅</div>
+    <h3>No events available</h3>
+    <p>Check back soon for upcoming club events.</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

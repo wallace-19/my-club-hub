@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Announcements{% endblock %}
+{% block page_title %}Announcements{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">Announcements</h1>
+    <p class="section-subtitle">Stay informed with the latest club news</p>
+  </div>
+</div>
+
+{% if announcements %}
+<div style="display:flex;flex-direction:column;gap:16px">
+  {% for ann in announcements %}
+  <div class="card" style="border-left:3px solid {% if ann.priority=='high' %}var(--danger){% elif ann.priority=='medium' %}var(--accent){% else %}var(--border2){% endif %}">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px">
+      <div>
+        <div style="font-family:var(--font-display);font-size:20px;font-weight:600">{{ ann.title }}</div>
+        <div class="announcement-footer" style="margin-top:4px">
+          <span>Posted by {{ ann.author or 'Admin' }}</span>
+          <span>{{ ann.created_at.strftime('%B %d, %Y') if ann.created_at else '' }}</span>
+          {% if ann.expires_at %}
+          <span>Expires {{ ann.expires_at.strftime('%b %d, %Y') }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <span class="badge badge-{{ ann.priority }}">{{ ann.priority|capitalize }}</span>
+    </div>
+    <div style="color:var(--text-2);line-height:1.7;font-size:14px">{{ ann.content }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="empty-state-icon">📣</div>
+    <h3>No announcements</h3>
+    <p>There are no active announcements at this time.</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

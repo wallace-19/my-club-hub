@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if action == 'edit' else 'Add' }} Member{% endblock %}
+{% block page_title %}{{ 'Edit' if action == 'edit' else 'Add' }} Member{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">{{ 'Edit Member' if action == 'edit' else 'Add New Member' }}</h1>
+    <p class="section-subtitle">{{ 'Update member information' if action == 'edit' else 'Register a new club member' }}</p>
+  </div>
+  <a href="{{ url_for('admin_members') }}" class="btn btn-secondary">
+    <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Members
+  </a>
+</div>
+
+<div class="card" style="max-width:680px">
+  <form method="POST">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="name">Full Name *</label>
+        <input type="text" name="name" id="name" class="form-control" required
+               value="{{ member.name if member else '' }}" placeholder="Jane Smith">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address *</label>
+        <input type="email" name="email" id="email" class="form-control" required
+               value="{{ member.email if member else '' }}" placeholder="jane@email.com">
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone Number</label>
+        <input type="tel" name="phone" id="phone" class="form-control"
+               value="{{ member.phone if member else '' }}" placeholder="+1 555-000-0000">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="club_affiliation">Club Affiliation</label>
+        <select name="club_affiliation" id="club_affiliation" class="form-control">
+          {% for aff in ['General','Technology','Arts','Sports','Science','Music','Literature','Business'] %}
+          <option value="{{ aff }}" {% if member and member.club_affiliation == aff %}selected{% endif %}>{{ aff }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="status">Status</label>
+      <select name="status" id="status" class="form-control">
+        <option value="active"   {% if not member or member.status == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if member and member.status == 'inactive' %}selected{% endif %}>Inactive</option>
+        <option value="pending"  {% if member and member.status == 'pending' %}selected{% endif %}>Pending</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">
+        Password {% if action == 'edit' %}<span class="text-muted">(leave blank to keep current)</span>{% else %}*{% endif %}
+      </label>
+      <input type="password" name="password" id="password" class="form-control"
+             placeholder="{% if action == 'edit' %}Leave blank to keep current{% else %}Min. 6 characters{% endif %}"
+             {% if action == 'add' %}minlength="6" required{% endif %}>
+      {% if action == 'add' %}
+      <p class="form-hint">Member will use this password to log in. Default: changeme123</p>
+      {% endif %}
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button type="submit" class="btn btn-primary">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        {{ 'Update Member' if action == 'edit' else 'Add Member' }}
+      </button>
+      <a href="{{ url_for('admin_members') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

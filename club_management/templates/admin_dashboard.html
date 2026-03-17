@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Row -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+    </div>
+    <div class="stat-value" data-target="{{ total_members }}">{{ total_members }}</div>
+    <div class="stat-label">Total Members</div>
+    <div class="progress"><div class="progress-bar" style="width:{{ [active_members/total_members*100 if total_members else 0, 100]|min|round }}%"></div></div>
+    <div class="text-muted text-sm mt-1">{{ active_members }} active</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+    <div class="stat-value" data-target="{{ upcoming_events }}">{{ upcoming_events }}</div>
+    <div class="stat-label">Upcoming Events</div>
+    <div class="text-muted text-sm mt-1">scheduled ahead</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </div>
+    <div class="stat-value" data-target="{{ active_announcements }}">{{ active_announcements }}</div>
+    <div class="stat-label">Announcements</div>
+    <div class="text-muted text-sm mt-1">currently active</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div class="stat-value" data-target="{{ total_members - active_members }}">{{ total_members - active_members }}</div>
+    <div class="stat-label">Inactive Members</div>
+    <div class="text-muted text-sm mt-1">need follow-up</div>
+  </div>
+</div>
+
+<!-- Charts + Recent Members -->
+<div class="dashboard-grid">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Member Growth</div>
+        <div class="card-subtitle">Last 6 months</div>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="memberChart"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">By Affiliation</div>
+        <div class="card-subtitle">Member distribution</div>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="affiliationChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Upcoming Events -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Upcoming Events</div>
+      <a href="{{ url_for('admin_events') }}" class="btn btn-ghost btn-sm">View all</a>
+    </div>
+    {% if events %}
+    <div class="table-container">
+      <table>
+        <thead><tr>
+          <th>Event</th><th>Date</th><th>Category</th><th>Registered</th>
+        </tr></thead>
+        <tbody>
+          {% for event in events %}
+          <tr>
+            <td>
+              <div style="font-weight:500">{{ event.title }}</div>
+              <div class="text-muted text-sm">{{ event.location or '—' }}</div>
+            </td>
+            <td>
+              <span class="font-mono" style="font-size:12px">{{ event.event_date|format_date }}</span>
+            </td>
+            <td><span class="badge badge-medium">{{ event.category }}</span></td>
+            <td>
+              <span class="font-mono" style="color:var(--gold);font-size:13px">
+                {{ event.registered_count }}{% if event.max_attendees %}/{{ event.max_attendees }}{% endif %}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding:24px">
+      <div class="empty-state-icon">📅</div>
+      <p>No upcoming events</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Recent Announcements -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Recent Announcements</div>
+      <a href="{{ url_for('admin_announcements') }}" class="btn btn-ghost btn-sm">View all</a>
+    </div>
+    {% if announcements %}
+    {% for ann in announcements %}
+    <div class="announcement-item">
+      <div class="announcement-header">
+        <div class="announcement-title">{{ ann.title }}</div>
+        <span class="badge badge-{{ ann.priority }}">{{ ann.priority|capitalize }}</span>
+      </div>
+      <div class="announcement-content">{{ ann.content[:120] }}{% if ann.content|length > 120 %}…{% endif %}</div>
+      <div class="announcement-footer">
+        <span>{{ ann.author or 'Admin' }}</span>
+        <span>{{ ann.created_at.strftime('%b %d, %Y') if ann.created_at else '' }}</span>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state" style="padding:24px">
+      <div class="empty-state-icon">📣</div>
+      <p>No announcements yet</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Recent Members -->
+  <div class="card span-2">
+    <div class="card-header">
+      <div class="card-title">Recently Joined Members</div>
+      <a href="{{ url_for('admin_members') }}" class="btn btn-ghost btn-sm">View all</a>
+    </div>
+    {% if recent_members %}
+    <div class="table-container">
+      <table>
+        <thead><tr>
+          <th>Member</th><th>Email</th><th>Phone</th><th>Affiliation</th><th>Status</th><th>Joined</th>
+        </tr></thead>
+        <tbody>
+          {% for m in recent_members %}
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="user-avatar" style="width:32px;height:32px;font-size:14px">{{ m.name[0].upper() }}</div>
+                <span style="font-weight:500">{{ m.name }}</span>
+              </div>
+            </td>
+            <td class="text-muted">{{ m.email }}</td>
+            <td class="text-muted font-mono" style="font-size:12px">{{ m.phone or '—' }}</td>
+            <td><span class="badge badge-medium">{{ m.club_affiliation }}</span></td>
+            <td><span class="badge badge-{{ m.status }}">{{ m.status|capitalize }}</span></td>
+            <td class="text-muted font-mono" style="font-size:12px">{{ m.joined_at.strftime('%b %d, %Y') if m.joined_at else '' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  fetch('/api/stats')
+    .then(r => r.json())
+    .then(data => {
+      const labels = data.signups.map(s => s.month);
+      const counts = data.signups.map(s => s.count);
+      initMemberChart('memberChart', labels, counts);
+
+      const affLabels = data.affiliations.map(a => a.club_affiliation);
+      const affCounts = data.affiliations.map(a => a.count);
+      initAffiliationChart('affiliationChart', affLabels, affCounts);
+    });
+</script>
+{% endblock %}
