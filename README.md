@@ -48,31 +48,24 @@ my-club-hub/
 ---
 
 ## Installation & Setup
-
 1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/my-club-hub.git
+   ```bash
+   git clone https://github.com/wallace-19/my-club-hub.git
 
-2. Install Python dependencies
+ 2. **Install Python Dependencies**
+    ```bash
+    pip install flask mysql-connector-python
 
-pip install flask mysql-connector-python
+ 3. **Setup MySQL database**
+   - create a database named club_management
+   - import the SQL file (club_management.sql) to create tables
+4. **Run the backend server**
+     python backend/app.py
+5. **Open the frontend**
+     . Open frontend/index.html     
 
-3. Setup MySQL database
-
- Create a database named club_management
-
-Import the SQL file (club_management.sql) to create tables
-
-4, Run the backend server
-
-python backend/app.py
-
-5. Open the frontend
-
-Open frontend/index.html in a web browser
 
 ### usage
-
 . Admin can log in to manage members, events, and announcements
 
 . Members can register, view events, and see announcements
@@ -116,4 +109,4 @@ Tables:
 Wallace Macharia
 Computer Science Student | Embu, Kenya
 Email: wallacemacharia31@email.com
-Phone: +254 7XX XXX XXX
+Phone: +254 745524208
