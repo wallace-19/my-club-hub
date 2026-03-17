@@ -71,7 +71,7 @@ python backend/app.py
 
 Open frontend/index.html in a web browser
 
-Usage
+### usage
 
 . Admin can log in to manage members, events, and announcements
 
@@ -79,7 +79,7 @@ Usage
 
 . Use the navigation menu to switch between pages
 
-Database Schema
+## Database Schema
 
 Tables:
 
@@ -91,7 +91,7 @@ Tables:
 
 4. announcements - Stores announcements
 
-Technologies Used
+## Technologies Used
 
 . Frontend: HTML, CSS, JavaScript
 
@@ -101,7 +101,7 @@ Technologies Used
 
 . API: RESTful API for frontend-backend communication
 
-Future Enhancements
+## Future Enhancements
 
 . Add image upload for events and member profiles
 
@@ -111,7 +111,7 @@ Future Enhancements
 
 . Deploy the system online for real-world access
 
-Author
+## Author
 
 Wallace Macharia
 Computer Science Student | Embu, Kenya
