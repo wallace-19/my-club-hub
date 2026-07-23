@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard{% endblock %}
+{% block page_title %}My Dashboard{% endblock %}
+{% block content %}
+
+<div class="card mb-6" style="background:linear-gradient(135deg,var(--surface2),var(--surface3));border-color:var(--success);position:relative;overflow:hidden">
+  <div style="position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:64px;opacity:.06">🏋️</div>
+  <div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--success);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Fitness Studio</div>
+    <div style="font-family:var(--font-display);font-size:26px;font-weight:600;margin-bottom:4px">Let's go, {{ session.get('user_name', 'Member') }} ✦</div>
+    <div class="text-muted">Your classes, membership plan, and studio notices — all in one place.</div>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+    <div class="stat-value" style="font-size:18px">{{ membership_plan or 'Standard' }}</div>
+    <div class="stat-label">My Plan</div>
+    <div class="text-muted text-sm mt-1">current membership</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+    <div class="stat-value" style="font-size:18px">{{ renewal_date.strftime('%b %d, %Y') if renewal_date else 'Not set' }}</div>
+    <div class="stat-label">Renewal Date</div>
+    <div class="text-muted text-sm mt-1">{% if renewal_date %}upcoming{% else %}contact studio{% endif %}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <div class="stat-value">{{ classes_this_month or 0 }}</div>
+    <div class="stat-label">Classes This Month</div>
+    <div class="text-muted text-sm mt-1">keep it up!</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+    <div class="stat-value">{{ todays_classes|length }}</div>
+    <div class="stat-label">Classes Today</div>
+    <div class="text-muted text-sm mt-1">on the schedule</div>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+
+  <div class="card span-2">
+    <div class="card-header">
+      <div><div class="card-title">Today's Classes</div><div class="card-subtitle">Live schedule</div></div>
+      <a href="{{ url_for('member.events') }}" class="btn btn-primary btn-sm">Book a class</a>
+    </div>
+    {% if todays_classes %}
+    <div class="table-container"><table>
+      <thead><tr><th>Class</th><th>Time</th><th>Room</th><th>Spots</th><th></th></tr></thead>
+      <tbody>{% for c in todays_classes %}<tr>
+        <td><div style="font-weight:500">{{ c.title }}</div><span class="badge badge-active" style="margin-top:4px">{{ c.category }}</span></td>
+        <td class="font-mono" style="font-size:12px">{{ c.event_time|format_time if c.event_time else '—' }}</td>
+        <td class="text-muted">{{ c.location or '—' }}</td>
+        <td><span class="font-mono" style="color:var(--success)">{{ c.check_ins }}{% if c.max_attendees %}/{{ c.max_attendees }}{% endif %}</span></td>
+        <td><a href="{{ url_for('member.events') }}" class="btn btn-secondary btn-sm">Join</a></td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}
+    <div class="empty-state" style="padding:24px"><div class="empty-state-icon">🏋️</div><p>No classes scheduled for today.</p></div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">My Booked Classes</div>
+      <a href="{{ url_for('member.events') }}" class="btn btn-ghost btn-sm">Browse</a>
+    </div>
+    {% if my_events %}
+    {% for e in my_events %}
+    <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div class="event-date-badge" style="text-align:center;min-width:44px">
+        <div class="event-date-day">{{ e.event_date.strftime('%d') if e.event_date else '' }}</div>
+        <div class="event-date-month">{{ e.event_date.strftime('%b') if e.event_date else '' }}</div>
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:500;font-family:var(--font-display);font-size:15px">{{ e.title }}</div>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          {% if e.location %}<span class="text-muted text-sm">📍 {{ e.location }}</span>{% endif %}
+          {% if e.event_time %}<span class="text-muted text-sm font-mono">{{ e.event_time|format_time }}</span>{% endif %}
+        </div>
+      </div>
+      <span class="badge badge-{{ 'cancelled' if e.status == 'cancelled' else 'active' }}">{{ 'Cancelled' if e.status == 'cancelled' else 'Booked' }}</span>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state" style="padding:24px">
+      <div class="empty-state-icon">📋</div>
+      <p>No classes booked yet.</p>
+      <a href="{{ url_for('member.events') }}" class="btn btn-primary btn-sm" style="margin-top:12px">Book a Class</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Studio Notices</div>
+      <a href="{{ url_for('member.announcements') }}" class="btn btn-ghost btn-sm">View all</a>
+    </div>
+    {% if announcements %}
+    {% for ann in announcements %}
+    <div class="announcement-item">
+      <div class="announcement-header">
+        <div class="announcement-title">{{ ann.title }}</div>
+        <span class="badge badge-{{ ann.priority }}">{{ ann.priority|capitalize }}</span>
+      </div>
+      <div class="announcement-content">{{ ann.content[:100] }}{% if ann.content|length > 100 %}…{% endif %}</div>
+      <div class="announcement-footer">
+        <span>{{ ann.author or 'Studio' }}</span>
+        <span>{{ ann.created_at.strftime('%b %d') if ann.created_at else '' }}</span>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state" style="padding:24px"><div class="empty-state-icon">📣</div><p>No notices yet.</p></div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

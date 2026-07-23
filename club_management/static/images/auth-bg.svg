@@ -1,0 +1,112 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgBase" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d0f14"/>
+      <stop offset="45%" stop-color="#111420"/>
+      <stop offset="100%" stop-color="#0a0c10"/>
+    </linearGradient>
+
+    <radialGradient id="glowGold" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="glowBlue" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4a7fa5" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#4a7fa5" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="vignette" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="70%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>
+    </radialGradient>
+
+  </defs>
+
+  <!-- base -->
+  <rect width="1920" height="1080" fill="url(#bgBase)"/>
+
+  <!-- ambient color glows, echoing the theme's radial accents -->
+  <ellipse cx="280" cy="900" rx="650" ry="420" fill="url(#glowGold)"/>
+  <ellipse cx="1650" cy="160" rx="560" ry="380" fill="url(#glowBlue)"/>
+
+  <!-- ===== Art-deco fan motif, bottom-left ===== -->
+  <g transform="translate(-40, 1120)" stroke="#c9a84c" fill="none" stroke-width="1.1" opacity="0.22">
+    <path d="M0,0 A 200,200 0 0 1 200,-200"/>
+    <path d="M0,0 A 320,320 0 0 1 320,-320"/>
+    <path d="M0,0 A 440,440 0 0 1 440,-440"/>
+    <path d="M0,0 A 560,560 0 0 1 560,-560"/>
+    <path d="M0,0 A 680,680 0 0 1 680,-680"/>
+  </g>
+  <g transform="translate(-40, 1120)" stroke="#c9a84c" fill="none" stroke-width="0.8" opacity="0.16">
+    <line x1="0" y1="0" x2="700" y2="-90"/>
+    <line x1="0" y1="0" x2="700" y2="-260"/>
+    <line x1="0" y1="0" x2="700" y2="-430"/>
+    <line x1="0" y1="0" x2="700" y2="-600"/>
+    <line x1="0" y1="0" x2="560" y2="-700"/>
+    <line x1="0" y1="0" x2="350" y2="-700"/>
+    <line x1="0" y1="0" x2="120" y2="-700"/>
+  </g>
+
+  <!-- ===== Art-deco fan motif, top-right (mirrored) ===== -->
+  <g transform="translate(1960, -40)" stroke="#c9a84c" fill="none" stroke-width="1.1" opacity="0.20">
+    <path d="M0,0 A 200,200 0 0 1 -200,200"/>
+    <path d="M0,0 A 320,320 0 0 1 -320,320"/>
+    <path d="M0,0 A 440,440 0 0 1 -440,440"/>
+    <path d="M0,0 A 560,560 0 0 1 -560,560"/>
+  </g>
+  <g transform="translate(1960, -40)" stroke="#c9a84c" fill="none" stroke-width="0.8" opacity="0.14">
+    <line x1="0" y1="0" x2="-600" y2="80"/>
+    <line x1="0" y1="0" x2="-600" y2="240"/>
+    <line x1="0" y1="0" x2="-600" y2="400"/>
+    <line x1="0" y1="0" x2="-480" y2="600"/>
+    <line x1="0" y1="0" x2="-280" y2="600"/>
+  </g>
+
+  <!-- ===== Fine hairline frame, set well inside the canvas edge ===== -->
+  <rect x="60" y="60" width="1800" height="960" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="1"/>
+  <rect x="84" y="84" width="1752" height="912" fill="none" stroke="#c9a84c" stroke-opacity="0.07" stroke-width="1"/>
+
+  <!-- corner accents on the hairline frame -->
+  <g stroke="#c9a84c" stroke-opacity="0.35" stroke-width="1.2" fill="none">
+    <path d="M60,110 L60,60 L110,60"/>
+    <path d="M1810,60 L1860,60 L1860,110"/>
+    <path d="M1860,970 L1860,1020 L1810,1020"/>
+    <path d="M110,1020 L60,1020 L60,970"/>
+  </g>
+
+  <!-- ===== Scattered fine diamond accents (very low opacity, decorative) ===== -->
+  <g fill="#c9a84c" opacity="0.5">
+    <rect x="958" y="56" width="5" height="5" transform="rotate(45 960 58)"/>
+    <rect x="958" y="1018" width="5" height="5" transform="rotate(45 960 1020)"/>
+    <rect x="56" y="538" width="5" height="5" transform="rotate(45 58 540)"/>
+    <rect x="1858" y="538" width="5" height="5" transform="rotate(45 1860 540)"/>
+  </g>
+
+  <!-- ===== Concentric arcs drifting through the mid-ground, very faint ===== -->
+  <g stroke="#9a9890" fill="none" stroke-width="0.6" opacity="0.08">
+    <circle cx="960" cy="540" r="300"/>
+    <circle cx="960" cy="540" r="430"/>
+    <circle cx="960" cy="540" r="560"/>
+  </g>
+
+  <!-- subtle grain-like texture using tiny dots, very sparse -->
+  <g fill="#e8e6e0" opacity="0.035">
+    <circle cx="200" cy="200" r="1"/>
+    <circle cx="500" cy="120" r="1"/>
+    <circle cx="800" cy="300" r="1"/>
+    <circle cx="1100" cy="150" r="1"/>
+    <circle cx="1400" cy="260" r="1"/>
+    <circle cx="1700" cy="400" r="1"/>
+    <circle cx="300" cy="700" r="1"/>
+    <circle cx="650" cy="900" r="1"/>
+    <circle cx="950" cy="800" r="1"/>
+    <circle cx="1250" cy="950" r="1"/>
+    <circle cx="1550" cy="850" r="1"/>
+    <circle cx="1800" cy="700" r="1"/>
+  </g>
+
+  <!-- vignette to keep edges dark and focus center -->
+  <rect width="1920" height="1080" fill="url(#vignette)"/>
+</svg>

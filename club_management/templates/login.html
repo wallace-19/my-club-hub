@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Sign In{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block auth_content %}
+<div class="auth-container">
+  <div class="auth-brand">
+    <img src="{{ url_for('static', filename='images/icon.png') }}"
+         class="auth-brand-logo"
+         width="56" height="56"
+         alt="ClubHub logo">
+    <div class="auth-brand-name">MyClubHub</div>
+    <div class="auth-brand-tagline">
+      <span class="tagline-word connect">Connect</span>
+      <span>•</span>
+      <span class="tagline-word manage">Manage</span>
+      <span>•</span>
+      <span class="tagline-word grow">Grow</span>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+          {{ message }}
+          <button type="button" class="flash-dismiss" aria-label="Dismiss" onclick="this.parentElement.remove()">×</button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="auth-card">
+    <h1 class="auth-title">Welcome back</h1>
+
+    <div class="role-tabs" role="tablist">
+      <div class="role-tab active" data-role="member" role="tab" aria-selected="true">
+        <div class="role-tab-icon">👤</div>
+        Member
+      </div>
+      {% if show_admin_tab %}
+      <div class="role-tab" data-role="admin" role="tab" aria-selected="false">
+        <div class="role-tab-icon">🛡️</div>
+        Administrator
+      </div>
+      {% endif %}
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="role" id="roleInput" value="member">
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input type="email" name="email" id="email" class="form-control"
+               placeholder="your@email.com" required autocomplete="email" autofocus>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="password-field">
+          <input type="password" name="password" id="password" class="form-control"
+                 placeholder="••••••••" required autocomplete="current-password">
+          <button type="button" class="password-toggle" id="passwordToggle" aria-label="Show password">
+            <svg viewBox="0 0 24 24" id="eyeIcon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-row-between">
+        <label class="checkbox-label">
+          <input type="checkbox" name="remember" id="remember">
+          Remember me
+        </label>
+        <a href="{{ url_for('auth.forgot_password') }}" class="link-muted">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="submitBtn" style="width:100%;justify-content:center;margin-top:4px">
+        <span id="submitText">Sign In</span>
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <span style="opacity:.65">•</span>
+      New member?
+      <a href="{{ url_for('auth.register') }}">Create an account</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Role tab switching
+  document.querySelectorAll('.role-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.role-tab').forEach(function (t) {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      document.getElementById('roleInput').value = tab.dataset.role;
+    });
+  });
+
+  // Show/hide password
+  document.getElementById('passwordToggle').addEventListener('click', function () {
+    var input = document.getElementById('password');
+    var isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    this.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+  });
+
+  // Prevent double-submit
+  document.getElementById('loginForm').addEventListener('submit', function () {
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    document.getElementById('submitText').textContent = 'Signing in…';
+  });
+</script>
+{% endblock %}

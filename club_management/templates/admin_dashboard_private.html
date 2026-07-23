@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Private Members Dashboard{% endblock %}
+{% block page_title %}{{ session.get('club_name', 'Private Members Club') }}{% endblock %}
+{% block extra_css %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="card mb-6" style="background:linear-gradient(135deg,var(--surface2),var(--surface3));border-color:var(--gold);position:relative;overflow:hidden">
+  <div style="position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:72px;opacity:.06;pointer-events:none">🏛️</div>
+  <div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Private Members Club</div>
+    <div style="font-family:var(--font-display);font-size:26px;font-weight:600;margin-bottom:4px">Welcome, {{ session.get('user_name', 'Admin') }} ✦</div>
+    <div class="text-muted">Manage memberships, exclusive events, renewals, and committee roles.</div>
+  </div>
+</div>
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <div class="stat-value">{{ total_members }}</div>
+    <div class="stat-label">Total Members</div>
+    <div class="progress"><div class="progress-bar" data-progress="{{ [active_members/total_members*100 if total_members else 0, 100]|min|round }}"></div></div>
+    <div class="text-muted text-sm mt-1">{{ active_members }} active · {{ pending_members }} pending</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+    <div class="stat-value">{{ upcoming_events }}</div>
+    <div class="stat-label">Exclusive Events</div>
+    <div class="text-muted text-sm mt-1">members-only upcoming</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    <div class="stat-value">{{ pending_members }}</div>
+    <div class="stat-label">Renewals Due</div>
+    <div class="text-muted text-sm mt-1"><a href="{{ url_for('admin.admin_members', status='pending') }}" class="text-muted">review now</a></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+    <div class="stat-value">{{ active_announcements }}</div>
+    <div class="stat-label">Club Notices</div>
+    <div class="text-muted text-sm mt-1">currently active</div>
+  </div>
+</div>
+<div class="dashboard-grid">
+  <div class="card">
+    <div class="card-header"><div><div class="card-title">Members-Only Events</div><div class="card-subtitle">Upcoming occasions</div></div><a href="{{ url_for('admin.admin_events') }}" class="btn btn-ghost btn-sm">Manage</a></div>
+    {% if events %}<div class="table-container"><table>
+      <thead><tr><th>Event</th><th>Date</th><th>Venue</th><th>RSVPs</th></tr></thead>
+      <tbody>{% for e in events %}<tr>
+        <td><div style="font-weight:500">{{ e.title }}</div><span class="badge badge-upcoming" style="margin-top:4px">{{ e.category }}</span></td>
+        <td><span class="font-mono" style="font-size:12px">{{ e.event_date|format_date }}</span></td>
+        <td class="text-muted">{{ e.location or '—' }}</td>
+        <td><span class="font-mono" style="color:var(--gold);font-size:13px">{{ e.registered_count }}{% if e.max_attendees %}/{{ e.max_attendees }}{% endif %}</span></td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<div class="empty-state" style="padding:24px"><div class="empty-state-icon">🎩</div><p>No events scheduled yet</p></div>{% endif %}
+  </div>
+  <div class="card"><div class="card-header"><div><div class="card-title">Membership Tiers</div><div class="card-subtitle">Distribution</div></div></div><div class="chart-wrap"><canvas id="affiliationChart"></canvas></div></div>
+  <div class="card"><div class="card-header"><div><div class="card-title">Membership Growth</div><div class="card-subtitle">Last 6 months</div></div></div><div class="chart-wrap"><canvas id="memberChart"></canvas></div></div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Board Notices</div><a href="{{ url_for('admin.admin_announcements') }}" class="btn btn-ghost btn-sm">Manage</a></div>
+    {% if announcements %}{% for ann in announcements %}
+    <div class="announcement-item">
+      <div class="announcement-header"><div class="announcement-title">{{ ann.title }}</div><span class="badge badge-{{ ann.priority }}">{{ ann.priority|capitalize }}</span></div>
+      <div class="announcement-content">{{ ann.content[:120] }}{% if ann.content|length > 120 %}…{% endif %}</div>
+      <div class="announcement-footer"><span>{{ ann.author or 'Committee' }}</span><span>{{ ann.created_at.strftime('%b %d, %Y') if ann.created_at else '' }}</span></div>
+    </div>{% endfor %}
+    {% else %}<div class="empty-state" style="padding:24px"><div class="empty-state-icon">📜</div><p>No notices yet</p></div>{% endif %}
+  </div>
+  <div class="card span-2">
+    <div class="card-header"><div class="card-title">Member Directory</div><a href="{{ url_for('admin.admin_members') }}" class="btn btn-ghost btn-sm">View all</a></div>
+    {% if recent_members %}<div class="table-container"><table>
+      <thead><tr><th>Member</th><th>Email</th><th>Phone</th><th>Tier</th><th>Status</th><th>Since</th></tr></thead>
+      <tbody>{% for m in recent_members %}<tr>
+        <td><div style="display:flex;align-items:center;gap:10px"><div class="user-avatar" style="width:32px;height:32px;font-size:14px">{{ m.name[0].upper() }}</div><span style="font-weight:500">{{ m.name }}</span></div></td>
+        <td class="text-muted">{{ m.email }}</td>
+        <td class="text-muted font-mono" style="font-size:12px">{{ m.phone or '—' }}</td>
+        <td><span class="badge badge-upcoming">{{ m.club_affiliation }}</span></td>
+        <td><span class="badge badge-{{ m.status }}">{{ m.status|capitalize }}</span></td>
+        <td class="text-muted font-mono" style="font-size:12px">{{ m.joined_at.strftime('%b %d, %Y') if m.joined_at else '' }}</td>
+      </tr>{% endfor %}</tbody>
+    </table></div>{% endif %}
+  </div>
+
+  <!-- Renewals Due -->
+  <div class="card span-2">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Renewals Due (Next 30 Days)</div>
+        <div class="card-subtitle">{{ renewals_count or 0 }} member(s) need renewal</div>
+      </div>
+      <a href="{{ url_for('admin.admin_members') }}" class="btn btn-primary btn-sm">Manage Members</a>
+    </div>
+    {% if renewals_due %}
+    <div class="table-container"><table>
+      <thead><tr><th>Member</th><th>Email</th><th>Tier</th><th>Renewal Date</th></tr></thead>
+      <tbody>{% for r in renewals_due %}<tr>
+        <td style="font-weight:500">{{ r.name }}</td>
+        <td class="text-muted">{{ r.email }}</td>
+        <td><span class="badge badge-upcoming">{{ r.membership_tier }}</span></td>
+        <td><span class="font-mono" style="color:var(--warning);font-size:12px">{{ r.renewal_date.strftime('%b %d, %Y') if r.renewal_date else '—' }}</span></td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}
+    <div class="empty-state" style="padding:24px"><div class="empty-state-icon">✅</div><p>No renewals due in the next 30 days.</p></div>
+    {% endif %}
+  </div>
+
+  <!-- Membership Tiers Breakdown -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">Tier Breakdown</div></div>
+    {% if tiers %}
+    <div style="display:flex;flex-direction:column;gap:10px;padding:8px 0">
+      {% for t in tiers %}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span class="badge badge-upcoming">{{ t.membership_tier }}</span>
+        <span class="font-mono" style="color:var(--gold);font-size:14px">{{ t.cnt }} members</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding:24px"><div class="empty-state-icon">🏛️</div><p>No tier data yet.<br><small class="text-muted">Update members with their membership tier to see breakdown.</small></p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+fetch('/api/stats').then(r=>r.json()).then(data=>{
+  initMemberChart('memberChart',data.signups.map(s=>s.month),data.signups.map(s=>s.count));
+  initAffiliationChart('affiliationChart',data.affiliations.map(a=>a.club_affiliation),data.affiliations.map(a=>a.count));
+});
+</script>
+{% endblock %}

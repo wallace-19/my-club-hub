@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if action == 'edit' else 'Add' }} Member{% endblock %}
+{% block page_title %}{{ 'Edit' if action == 'edit' else 'Add' }} Member{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">{{ 'Edit Member' if action == 'edit' else 'Add New Member' }}</h1>
+    <p class="section-subtitle">{{ 'Update member information' if action == 'edit' else 'Register a new club member' }}</p>
+  </div>
+  <a href="{{ url_for('admin.admin_members') }}" class="btn btn-secondary">
+    <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Members
+  </a>
+</div>
+
+<div class="card" style="max-width:720px">
+  <form method="POST">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+    <!-- Basic Info -->
+    <div class="card-title" style="margin-bottom:16px">Basic Information</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="name">Full Name *</label>
+        <input type="text" name="name" id="name" class="form-control" required
+               value="{{ member.name if member else '' }}" placeholder="Jane Smith">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address *</label>
+        <input type="email" name="email" id="email" class="form-control" required
+               value="{{ member.email if member else '' }}" placeholder="jane@email.com">
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone Number</label>
+        <input type="tel" name="phone" id="phone" class="form-control"
+               value="{{ member.phone if member else '' }}" placeholder="+254 700 000 000">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="status">Status</label>
+        <select name="status" id="status" class="form-control">
+          <option value="active"   {% if not member or member.status == 'active' %}selected{% endif %}>Active</option>
+          <option value="inactive" {% if member and member.status == 'inactive' %}selected{% endif %}>Inactive</option>
+          <option value="pending"  {% if member and member.status == 'pending' %}selected{% endif %}>Pending</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Club Info -->
+    <div class="card-title" style="margin:24px 0 16px;padding-top:20px;border-top:1px solid var(--border)">Club Details</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="club_type">Club Type</label>
+        <select name="club_type" id="club_type" class="form-control" onchange="updateAffiliations()">
+          <option value="sports"  {% if member and member.club_type == 'sports' %}selected{% endif %}>🏅 Sports Club</option>
+          <option value="private" {% if member and member.club_type == 'private' %}selected{% endif %}>🏛️ Private Members</option>
+          <option value="campus"  {% if member and member.club_type == 'campus' %}selected{% endif %}>🎓 Campus Club</option>
+          <option value="fitness" {% if member and member.club_type == 'fitness' %}selected{% endif %}>🏋️ Fitness Studio</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="club_affiliation">
+          <span id="affiliation_label">Program / Affiliation</span>
+        </label>
+        <select name="club_affiliation" id="club_affiliation" class="form-control">
+          <!-- populated by JS -->
+        </select>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="membership_tier">Membership Tier / Plan</label>
+        <select name="membership_tier" id="membership_tier" class="form-control">
+          {% set tier = member.membership_tier if member else 'Standard' %}
+          {% for t in ['Standard','Full Member','Associate Member','Honorary Member','Corporate Member','Monthly','Quarterly','Annual','Student'] %}
+          <option value="{{ t }}" {% if tier == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="renewal_date">Renewal Date</label>
+        <input type="date" name="renewal_date" id="renewal_date" class="form-control"
+               value="{{ member.renewal_date.strftime('%Y-%m-%d') if member and member.renewal_date else '' }}">
+        <p class="form-hint">Leave blank if renewal tracking is not needed for this member.</p>
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div class="card-title" style="margin:24px 0 16px;padding-top:20px;border-top:1px solid var(--border)">Security</div>
+    <div class="form-group">
+      <label class="form-label" for="password">
+        Password {% if action == 'edit' %}<span class="text-muted">(leave blank to keep current)</span>{% else %}*{% endif %}
+      </label>
+      <input type="password" name="password" id="password" class="form-control"
+             placeholder="{% if action == 'edit' %}Leave blank to keep current{% else %}Min. 8 characters{% endif %}"
+             {% if action == 'add' %}minlength="8" required{% endif %}>
+      {% if action == 'add' %}
+      <p class="form-hint">Member will use this password to log in. Minimum 8 characters.</p>
+      {% endif %}
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+      <button type="submit" class="btn btn-primary">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        {{ 'Update Member' if action == 'edit' else 'Add Member' }}
+      </button>
+      <a href="{{ url_for('admin.admin_members') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script>
+var currentAffiliation = "{{ member.club_affiliation if member else '' }}";
+
+var affiliations = {
+  sports:  ['General','Running','Swimming','Tennis','Football','Basketball','Athletics','Rowing','Cycling'],
+  private: ['Full Member','Associate Member','Honorary Member','Corporate Member','Social Member'],
+  campus:  ['General','Arts','Science','Business','Engineering','Medicine','Law','Education'],
+  fitness: ['General','Yoga','CrossFit','Cardio','Weights','Pilates','Zumba','HIIT']
+};
+
+var labels = {
+  sports:  'Program / Sport',
+  private: 'Membership Category',
+  campus:  'Faculty / Department',
+  fitness: 'Program / Class Type'
+};
+
+function updateAffiliations() {
+  var type = document.getElementById('club_type').value;
+  var select = document.getElementById('club_affiliation');
+  var label = document.getElementById('affiliation_label');
+
+  label.textContent = labels[type] || 'Program / Affiliation';
+  select.innerHTML = '';
+
+  (affiliations[type] || []).forEach(function(aff) {
+    var opt = document.createElement('option');
+    opt.value = aff;
+    opt.textContent = aff;
+    if (aff === currentAffiliation) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+// Run on page load
+updateAffiliations();
+</script>
+{% endblock %}

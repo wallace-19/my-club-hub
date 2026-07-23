@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">Notifications</h1>
+    <p class="section-subtitle">{{ notifications|length }} notification{{ 's' if notifications|length != 1 }}</p>
+  </div>
+  {% if notifications %}
+  <form method="POST" action="{{ url_for('member.dismiss_all_notifications') }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-secondary">
+      <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      Clear All
+    </button>
+  </form>
+  {% endif %}
+</div>
+
+<div class="card">
+  {% if notifications %}
+  {% for n in notifications %}
+  <div class="announcement-item">
+    <div class="announcement-header">
+      <div class="announcement-title">
+        {{ n.title }}
+        {% if not n.is_read %}
+        <span class="badge badge-upcoming" style="margin-left:8px;font-size:10px">New</span>
+        {% endif %}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="badge badge-{{ n.type }}">{{ n.type|capitalize }}</span>
+        <form method="POST" action="{{ url_for('member.dismiss_notification', notif_id=n.id) }}">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--text-3)" title="Dismiss">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+    <div class="announcement-content">{{ n.message }}</div>
+    <div class="announcement-footer">
+      <span>{{ n.created_at.strftime('%b %d, %Y · %H:%M') if n.created_at else '' }}</span>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">🔔</div>
+    <h3>All caught up!</h3>
+    <p>No notifications at the moment.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

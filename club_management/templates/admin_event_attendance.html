@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Attendance — {{ event.title }}{% endblock %}
+{% block page_title %}Attendance{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">{{ event.title }}</h1>
+    <p class="section-subtitle">
+      {{ event.event_date|format_date }}
+      {% if event.event_time %} · {{ event.event_time|format_time }}{% endif %}
+      {% if event.location %} · {{ event.location }}{% endif %}
+    </p>
+  </div>
+  <a href="{{ url_for('admin.admin_events') }}" class="btn btn-secondary">
+    <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Events
+  </a>
+</div>
+
+<!-- Summary -->
+<div class="stats-grid" style="margin-bottom:24px">
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+    <div class="stat-value">{{ members|length }}</div>
+    <div class="stat-label">Registered</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="stat-value">{{ attended_count }}</div>
+    <div class="stat-label">Attended</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+    <div class="stat-value">{{ members|length - attended_count }}</div>
+    <div class="stat-label">Absent</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
+    <div class="stat-value">{{ ((attended_count / members|length * 100)|round|int) if members|length > 0 else 0 }}%</div>
+    <div class="stat-label">Attendance Rate</div>
+  </div>
+</div>
+
+<div class="card">
+  {% if members %}
+  <form method="POST" action="{{ url_for('admin.admin_save_attendance', event_id=event.id) }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+    <div class="card-header" style="margin-bottom:0;padding-bottom:16px;border-bottom:1px solid var(--border)">
+      <div class="card-title">Mark Attendance</div>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="selectAll(true)">Select All</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="selectAll(false)">Clear All</button>
+        <button type="submit" class="btn btn-primary btn-sm">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Save Attendance
+        </button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead><tr>
+          <th style="width:48px">
+            <input type="checkbox" id="selectAllBox" onchange="selectAll(this.checked)"
+                   style="width:16px;height:16px;accent-color:var(--gold);cursor:pointer">
+          </th>
+          <th>Member</th>
+          <th>Email</th>
+          <th>Program / Affiliation</th>
+          <th>Status</th>
+        </tr></thead>
+        <tbody>
+          {% for m in members %}
+          <tr id="row-{{ m.id }}" class="{{ 'attended-row' if m.attended else '' }}"
+              style="{{ 'background:rgba(76,175,129,.06)' if m.attended else '' }}">
+            <td>
+              <input type="checkbox" name="attended" value="{{ m.id }}"
+                     id="chk-{{ m.id }}"
+                     {{ 'checked' if m.attended else '' }}
+                     onchange="highlightRow({{ m.id }}, this.checked)"
+                     style="width:16px;height:16px;accent-color:var(--gold);cursor:pointer">
+            </td>
+            <td>
+              <label for="chk-{{ m.id }}" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                <div class="user-avatar" style="width:32px;height:32px;font-size:14px">{{ m.name[0].upper() }}</div>
+                <span style="font-weight:500">{{ m.name }}</span>
+              </label>
+            </td>
+            <td class="text-muted">{{ m.email }}</td>
+            <td><span class="badge badge-medium">{{ m.club_affiliation }}</span></td>
+            <td>
+              {% if m.attended %}
+              <span class="badge badge-active">✓ Present</span>
+              {% else %}
+              <span class="badge badge-inactive">Absent</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="padding:16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+      <button type="submit" class="btn btn-primary">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Attendance
+      </button>
+    </div>
+  </form>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">👥</div>
+    <h3>No registered members</h3>
+    <p>Members must register for this event before you can mark attendance.</p>
+    <a href="{{ url_for('admin.admin_events') }}" class="btn btn-primary btn-sm" style="margin-top:12px">Back to Events</a>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+function selectAll(checked) {
+  document.querySelectorAll('input[name="attended"]').forEach(function(cb) {
+    cb.checked = checked;
+    highlightRow(cb.value, checked);
+  });
+  document.getElementById('selectAllBox').checked = checked;
+}
+
+function highlightRow(id, attended) {
+  var row = document.getElementById('row-' + id);
+  var badge = row.querySelector('.badge:last-child');
+  if (attended) {
+    row.style.background = 'rgba(76,175,129,.06)';
+    badge.className = 'badge badge-active';
+    badge.textContent = '✓ Present';
+  } else {
+    row.style.background = '';
+    badge.className = 'badge badge-inactive';
+    badge.textContent = 'Absent';
+  }
+}
+</script>
+{% endblock %}

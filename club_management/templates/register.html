@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block auth_content %}
+<div class="auth-container" style="max-width:520px">
+  <div class="auth-brand">
+    <span class="auth-brand-icon">◈</span>
+    <div class="auth-brand-name">ClubHub</div>
+    <div class="auth-brand-tagline">Create your member account</div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for category, message in messages %}
+      <div class="flash flash-{{ category }}" style="margin-bottom:12px">
+        {{ message }}<button onclick="this.parentElement.remove()">×</button>
+      </div>
+    {% endfor %}{% endif %}
+  {% endwith %}
+
+  <div class="auth-card">
+    <h1 class="auth-title">Join the Club</h1>
+
+    {% if club_name %}
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.25);border-radius:var(--radius);margin-bottom:24px">
+      <span style="font-size:20px">
+        {% if club_type == 'sports' %}🏅
+        {% elif club_type == 'private' %}🏛️
+        {% elif club_type == 'campus' %}🎓
+        {% elif club_type == 'fitness' %}🏋️
+        {% endif %}
+      </span>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--gold)">{{ club_name }}</div>
+        <div style="font-size:11px;color:var(--text-3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.06em">
+          {% if club_type == 'sports' %}Sports Club
+          {% elif club_type == 'private' %}Private Members Club
+          {% elif club_type == 'campus' %}Campus Club
+          {% elif club_type == 'fitness' %}Fitness Studio
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <form method="POST">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="club_type" value="{{ club_type or 'sports' }}">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name</label>
+          <input type="text" name="name" id="name" class="form-control"
+                 placeholder="Jane Smith" required autofocus>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input type="email" name="email" id="email" class="form-control"
+                 placeholder="jane@email.com" required autocomplete="email">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone Number</label>
+        <input type="tel" name="phone" id="phone" class="form-control"
+               placeholder="+254 700 000 000">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="club_affiliation">
+          {% if club_type == 'sports' %}Program / Sport
+          {% elif club_type == 'private' %}Membership Tier
+          {% elif club_type == 'campus' %}Faculty / Department
+          {% elif club_type == 'fitness' %}Program / Class Type
+          {% else %}Club Affiliation
+          {% endif %}
+        </label>
+        <select name="club_affiliation" id="club_affiliation" class="form-control">
+          {% if club_type == 'sports' %}
+            <option value="General">General</option>
+            <option value="Running">Running</option>
+            <option value="Swimming">Swimming</option>
+            <option value="Tennis">Tennis</option>
+            <option value="Football">Football</option>
+            <option value="Basketball">Basketball</option>
+            <option value="Athletics">Athletics</option>
+            <option value="Rowing">Rowing</option>
+            <option value="Cycling">Cycling</option>
+          {% elif club_type == 'private' %}
+            <option value="Full Member">Full Member</option>
+            <option value="Associate Member">Associate Member</option>
+            <option value="Honorary Member">Honorary Member</option>
+            <option value="Corporate Member">Corporate Member</option>
+            <option value="Social Member">Social Member</option>
+          {% elif club_type == 'campus' %}
+            <option value="General">General</option>
+            <option value="Arts">Arts</option>
+            <option value="Science">Science</option>
+            <option value="Business">Business</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Medicine">Medicine</option>
+            <option value="Law">Law</option>
+            <option value="Education">Education</option>
+          {% elif club_type == 'fitness' %}
+            <option value="General">General</option>
+            <option value="Yoga">Yoga</option>
+            <option value="CrossFit">CrossFit</option>
+            <option value="Cardio">Cardio</option>
+            <option value="Weights">Weights</option>
+            <option value="Pilates">Pilates</option>
+            <option value="Zumba">Zumba</option>
+            <option value="HIIT">HIIT</option>
+          {% else %}
+            <option value="General">General</option>
+            <option value="Technology">Technology</option>
+            <option value="Arts">Arts</option>
+            <option value="Sports">Sports</option>
+            <option value="Science">Science</option>
+            <option value="Music">Music</option>
+            <option value="Business">Business</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="password-field">
+            <input type="password" name="password" id="password" class="form-control"
+                   placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password">
+            <button type="button" class="password-toggle" id="passwordToggle" aria-label="Show password">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="confirm_password">Confirm Password</label>
+          <input type="password" name="confirm_password" id="confirm_password"
+                 class="form-control" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px">
+        Create Account
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </form>
+
+    <div class="auth-footer" style="margin-top:16px">
+      Already a member? <a href="{{ url_for('auth.login') }}">Sign in</a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('passwordToggle').addEventListener('click', function() {
+  var input = document.getElementById('password');
+  var isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  this.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+});
+</script>
+{% endblock %}

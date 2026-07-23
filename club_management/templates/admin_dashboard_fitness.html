@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Fitness Studio Dashboard{% endblock %}
+{% block page_title %}{{ session.get('club_name', 'Fitness Studio') }}{% endblock %}
+{% block extra_css %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="card mb-6" style="background:linear-gradient(135deg,var(--surface2),var(--surface3));border-color:var(--success);position:relative;overflow:hidden">
+  <div style="position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:72px;opacity:.06;pointer-events:none">🏋️</div>
+  <div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--success);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Fitness Studio</div>
+    <div style="font-family:var(--font-display);font-size:26px;font-weight:600;margin-bottom:4px">Welcome, {{ session.get('user_name', 'Admin') }} ✦</div>
+    <div class="text-muted">Manage your classes, instructor assignments, member check-ins, and monthly renewals.</div>
+  </div>
+</div>
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <div class="stat-value">{{ total_members }}</div>
+    <div class="stat-label">Active Members</div>
+    <div class="progress"><div class="progress-bar" data-progress="{{ [active_members/total_members*100 if total_members else 0, 100]|min|round }}"></div></div>
+    <div class="text-muted text-sm mt-1">{{ active_members }} active · {{ pending_members }} pending</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+    <div class="stat-value">{{ upcoming_events }}</div>
+    <div class="stat-label">Classes This Week</div>
+    <div class="text-muted text-sm mt-1">on the schedule</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    <div class="stat-value">{{ pending_members }}</div>
+    <div class="stat-label">Renewals Due</div>
+    <div class="text-muted text-sm mt-1"><a href="{{ url_for('admin.admin_members', status='pending') }}" class="text-muted">follow up</a></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
+    <div class="stat-value">{{ active_announcements }}</div>
+    <div class="stat-label">Studio Notices</div>
+    <div class="text-muted text-sm mt-1">currently active</div>
+  </div>
+</div>
+<div class="dashboard-grid">
+  <div class="card">
+    <div class="card-header"><div><div class="card-title">Class Schedule</div><div class="card-subtitle">Upcoming classes</div></div><a href="{{ url_for('admin.admin_events') }}" class="btn btn-ghost btn-sm">Manage</a></div>
+    {% if events %}<div class="table-container"><table>
+      <thead><tr><th>Class</th><th>Date</th><th>Room</th><th>Check-ins</th></tr></thead>
+      <tbody>{% for e in events %}<tr>
+        <td><div style="font-weight:500">{{ e.title }}</div><span class="badge badge-active" style="margin-top:4px">{{ e.category }}</span></td>
+        <td><span class="font-mono" style="font-size:12px">{{ e.event_date|format_date }}</span></td>
+        <td class="text-muted">{{ e.location or '—' }}</td>
+        <td><span class="font-mono" style="color:var(--success);font-size:13px">{{ e.registered_count }}{% if e.max_attendees %}/{{ e.max_attendees }}{% endif %}</span></td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<div class="empty-state" style="padding:24px"><div class="empty-state-icon">🏃</div><p>No classes scheduled yet</p></div>{% endif %}
+  </div>
+  <div class="card"><div class="card-header"><div><div class="card-title">Member Growth</div><div class="card-subtitle">Last 6 months</div></div></div><div class="chart-wrap"><canvas id="memberChart"></canvas></div></div>
+  <div class="card"><div class="card-header"><div><div class="card-title">Members by Program</div><div class="card-subtitle">Distribution</div></div></div><div class="chart-wrap"><canvas id="affiliationChart"></canvas></div></div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Studio Notices</div><a href="{{ url_for('admin.admin_announcements') }}" class="btn btn-ghost btn-sm">Manage</a></div>
+    {% if announcements %}{% for ann in announcements %}
+    <div class="announcement-item">
+      <div class="announcement-header"><div class="announcement-title">{{ ann.title }}</div><span class="badge badge-{{ ann.priority }}">{{ ann.priority|capitalize }}</span></div>
+      <div class="announcement-content">{{ ann.content[:120] }}{% if ann.content|length > 120 %}…{% endif %}</div>
+      <div class="announcement-footer"><span>{{ ann.author or 'Studio' }}</span><span>{{ ann.created_at.strftime('%b %d, %Y') if ann.created_at else '' }}</span></div>
+    </div>{% endfor %}
+    {% else %}<div class="empty-state" style="padding:24px"><div class="empty-state-icon">📣</div><p>No notices yet</p></div>{% endif %}
+  </div>
+  <div class="card span-2">
+    <div class="card-header"><div class="card-title">Member Roster</div><div style="display:flex;gap:8px"><a href="{{ url_for('admin.admin_members') }}" class="btn btn-primary btn-sm">+ Add Member</a><a href="{{ url_for('admin.admin_members') }}" class="btn btn-ghost btn-sm">View all</a></div></div>
+    {% if recent_members %}<div class="table-container"><table>
+      <thead><tr><th>Member</th><th>Email</th><th>Phone</th><th>Program</th><th>Status</th><th>Joined</th></tr></thead>
+      <tbody>{% for m in recent_members %}<tr>
+        <td><div style="display:flex;align-items:center;gap:10px"><div class="user-avatar" style="width:32px;height:32px;font-size:14px">{{ m.name[0].upper() }}</div><span style="font-weight:500">{{ m.name }}</span></div></td>
+        <td class="text-muted">{{ m.email }}</td>
+        <td class="text-muted font-mono" style="font-size:12px">{{ m.phone or '—' }}</td>
+        <td><span class="badge badge-active">{{ m.club_affiliation }}</span></td>
+        <td><span class="badge badge-{{ m.status }}">{{ m.status|capitalize }}</span></td>
+        <td class="text-muted font-mono" style="font-size:12px">{{ m.joined_at.strftime('%b %d, %Y') if m.joined_at else '' }}</td>
+      </tr>{% endfor %}</tbody>
+    </table></div>{% endif %}
+  </div>
+
+  <!-- Today's Classes -->
+  <div class="card span-2">
+    <div class="card-header">
+      <div><div class="card-title">Today's Classes</div><div class="card-subtitle">Live check-in status</div></div>
+      <a href="{{ url_for('admin.admin_events') }}" class="btn btn-primary btn-sm">+ Add Class</a>
+    </div>
+    {% if todays_classes %}
+    <div class="table-container"><table>
+      <thead><tr><th>Class</th><th>Time</th><th>Room</th><th>Instructor</th><th>Check-ins</th><th>Capacity</th></tr></thead>
+      <tbody>{% for c in todays_classes %}<tr>
+        <td style="font-weight:500">{{ c.title }}</td>
+        <td class="font-mono" style="font-size:12px">{{ c.event_time|format_time if c.event_time else '—' }}</td>
+        <td class="text-muted">{{ c.location or '—' }}</td>
+        <td class="text-muted">{{ c.instructor or '—' }}</td>
+        <td><span class="font-mono" style="color:var(--success)">{{ c.check_ins }}</span></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="flex:1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden">
+              <div style="height:100%;width:{{ c.capacity_pct }}%;background:var(--success);border-radius:2px"></div>
+            </div>
+            <span class="font-mono" style="font-size:11px;color:var(--text-3)">{{ c.capacity_pct }}%</span>
+          </div>
+        </td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}
+    <div class="empty-state" style="padding:24px"><div class="empty-state-icon">🏋️</div><p>No classes scheduled for today.</p></div>
+    {% endif %}
+  </div>
+
+  <!-- Membership Plans + Capacity -->
+  <div class="card">
+    <div class="card-header"><div><div class="card-title">Membership Plans</div><div class="card-subtitle">Active distribution</div></div></div>
+    {% if plans %}
+    <div style="display:flex;flex-direction:column;gap:0">
+      {% for p in plans %}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+        <span class="badge badge-active">{{ p.plan }}</span>
+        <span class="font-mono" style="color:var(--success);font-size:14px">{{ p.cnt }} members</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding:24px"><div class="empty-state-icon">💪</div><p>No plan data yet.</p></div>
+    {% endif %}
+  </div>
+
+  <!-- Capacity & Renewals -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">Studio Stats</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:8px 0">
+      <div class="stat-card" style="padding:16px">
+        <div class="stat-value" style="font-size:28px">{{ avg_capacity or 0 }}%</div>
+        <div class="stat-label">Avg Class Capacity</div>
+      </div>
+      <div class="stat-card" style="padding:16px">
+        <div class="stat-value" style="font-size:28px;color:var(--warning)">{{ renewals_this_month or 0 }}</div>
+        <div class="stat-label">Renewals This Month</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+fetch('/api/stats').then(r=>r.json()).then(data=>{
+  initMemberChart('memberChart',data.signups.map(s=>s.month),data.signups.map(s=>s.count));
+  initAffiliationChart('affiliationChart',data.affiliations.map(a=>a.club_affiliation),data.affiliations.map(a=>a.count));
+});
+</script>
+{% endblock %}

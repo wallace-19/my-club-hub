@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">My Profile</h1>
+    <p class="section-subtitle">Manage your account information</p>
+  </div>
+</div>
+
+<div class="profile-layout" style="display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start">
+
+  <!-- ── Profile Card ── -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="card" style="text-align:center">
+
+      <!-- Avatar -->
+      {% if member and member.profile_pic %}
+      <img
+        src="{{ url_for('static', filename='uploads/profile_pics/' ~ member.profile_pic) }}"
+        alt="Profile picture"
+        id="avatarPreview"
+        style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 16px;display:block;border:2px solid var(--border)">
+      {% else %}
+      <div class="member-avatar-lg" id="avatarFallback" style="margin:0 auto 16px;width:80px;height:80px;font-size:34px">
+        {{ member.name[0].upper() if member else 'M' }}
+      </div>
+      {% endif %}
+
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:600">{{ member.name if member else '' }}</div>
+      <div class="text-muted text-sm" style="margin-top:4px">{{ member.email if member else '' }}</div>
+
+      <!-- Club type badge -->
+      <div style="margin-top:10px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-{{ 'active' if member and member.status == 'active' else 'inactive' }}">
+          {{ member.status|capitalize if member else 'Member' }}
+        </span>
+        <span class="badge badge-upcoming">
+          {% if club_type == 'sports' %}🏅 Sports
+          {% elif club_type == 'private' %}🏛️ Private
+          {% elif club_type == 'campus' %}🎓 Campus
+          {% elif club_type == 'fitness' %}🏋️ Fitness
+          {% endif %}
+        </span>
+      </div>
+
+      <!-- Tier + Renewal -->
+      {% if member %}
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);text-align:left">
+        <div style="font-size:11px;font-family:var(--font-mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Membership</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="text-sm">
+            <span class="text-muted">Tier / Plan: </span>
+            <span class="text-gold font-mono">{{ member.membership_tier or 'Standard' }}</span>
+          </div>
+          <div class="text-sm">
+            <span class="text-muted">Renewal: </span>
+            {% if member.renewal_date %}
+              {% set days_left = (member.renewal_date - member.renewal_date.today()).days %}
+              <span style="color:{% if days_left <= 7 %}var(--danger){% elif days_left <= 30 %}var(--warning){% else %}var(--success){% endif %}">
+                {{ member.renewal_date.strftime('%b %d, %Y') }}
+                {% if days_left <= 30 %}({{ days_left }}d left){% endif %}
+              </span>
+            {% else %}
+              <span class="text-muted">Not set</span>
+            {% endif %}
+          </div>
+          <div class="text-sm">
+            <span class="text-muted">Program: </span>
+            <span class="text-gold">{{ member.club_affiliation or 'General' }}</span>
+          </div>
+          <div class="text-sm">
+            <span class="text-muted">Phone: </span>
+            <span>{{ member.phone or '—' }}</span>
+          </div>
+          <div class="text-sm">
+            <span class="text-muted">Member since: </span>
+            <span>{{ member.joined_at.strftime('%b %Y') if member.joined_at else '—' }}</span>
+          </div>
+        </div>
+      </div>
+
+      {% if member.profile_bio %}
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);text-align:left">
+        <div style="font-size:11px;font-family:var(--font-mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Bio</div>
+        <div class="text-sm text-muted" style="line-height:1.6">{{ member.profile_bio }}</div>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+
+    <!-- ── Activity Stats ── -->
+    <div class="card">
+      <div style="font-size:11px;font-family:var(--font-mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">My Activity</div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+          <span class="text-sm text-muted">Sessions registered</span>
+          <span class="font-mono" style="color:var(--gold);font-size:18px;font-weight:600">{{ sessions_registered }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+          <span class="text-sm text-muted">Sessions attended</span>
+          <span class="font-mono" style="color:var(--success);font-size:18px;font-weight:600">{{ sessions_attended }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+          <span class="text-sm text-muted">Upcoming booked</span>
+          <span class="font-mono" style="color:var(--accent);font-size:18px;font-weight:600">{{ upcoming_count }}</span>
+        </div>
+      </div>
+      {% if sessions_registered > 0 %}
+      <div style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span class="text-sm text-muted">Attendance rate</span>
+          <span class="font-mono text-sm" style="color:var(--gold)">{{ (sessions_attended / sessions_registered * 100)|round|int }}%</span>
+        </div>
+        <div class="progress">
+          <div class="progress-bar" style="width:{{ (sessions_attended / sessions_registered * 100)|round|int }}%"></div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ── Edit Form ── -->
+  <div class="card">
+    <div class="card-header" style="margin-bottom:24px">
+      <div class="card-title">Edit Information</div>
+    </div>
+    <form method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name</label>
+          <input type="text" name="name" id="name" class="form-control" required
+                 value="{{ member.name if member else '' }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" value="{{ member.email if member else '' }}" disabled
+                 style="opacity:.5;cursor:not-allowed">
+          <p class="form-hint">Email cannot be changed. Contact admin.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number</label>
+          <input type="tel" name="phone" id="phone" class="form-control"
+                 value="{{ member.phone if member else '' }}" placeholder="+254 700 000 000">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="club_affiliation">
+            {% if club_type == 'sports' %}Program / Sport
+            {% elif club_type == 'private' %}Membership Category
+            {% elif club_type == 'campus' %}Faculty / Department
+            {% elif club_type == 'fitness' %}Program / Class Type
+            {% else %}Club Affiliation{% endif %}
+          </label>
+          <select name="club_affiliation" id="club_affiliation" class="form-control">
+            {% for aff in affiliation_options %}
+            <option value="{{ aff }}" {% if member and member.club_affiliation == aff %}selected{% endif %}>{{ aff }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="profile_bio">Bio</label>
+        <textarea name="profile_bio" id="profile_bio" class="form-control" rows="4"
+                  placeholder="Tell us a bit about yourself…">{{ member.profile_bio if member and member.profile_bio else '' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="profile_pic">Profile Picture</label>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          {% if member and member.profile_pic %}
+          <img
+            src="{{ url_for('static', filename='uploads/profile_pics/' ~ member.profile_pic) }}"
+            alt="Current profile picture"
+            id="picPreviewSmall"
+            style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">
+          {% else %}
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:var(--gold)" id="picPreviewSmall">
+            {{ member.name[0].upper() if member else 'M' }}
+          </div>
+          {% endif %}
+          <div style="flex:1">
+            <input
+              type="file"
+              name="profile_pic"
+              id="profile_pic"
+              class="form-control"
+              accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+              onchange="previewPic(this)">
+            <p class="form-hint" style="margin-top:5px">Only <strong>.png</strong> and <strong>.jpeg</strong> files are accepted. Max recommended size: 2 MB.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding-top:16px;border-top:1px solid var(--border)">
+        <button type="submit" class="btn btn-primary">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewPic(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+
+  // Strict client-side check — server validates too
+  var allowed = ['.png', '.jpg', '.jpeg'];
+  var nameLower = file.name.toLowerCase();
+  var valid = allowed.some(function(ext) { return nameLower.endsWith(ext); });
+  if (!valid) {
+    alert('Only .png and .jpeg files are allowed for profile pictures.');
+    input.value = '';
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    // Update the preview thumbnail in the form
+    var small = document.getElementById('picPreviewSmall');
+    if (small) {
+      var img = document.createElement('img');
+      img.src = e.target.result;
+      img.id = 'picPreviewSmall';
+      img.style.cssText = 'width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--border)';
+      small.parentNode.replaceChild(img, small);
+    }
+
+    // Update the large avatar at the top of the profile card
+    var fallback = document.getElementById('avatarFallback');
+    var preview  = document.getElementById('avatarPreview');
+    if (fallback) {
+      var bigImg = document.createElement('img');
+      bigImg.src = e.target.result;
+      bigImg.id  = 'avatarPreview';
+      bigImg.alt = 'Profile picture';
+      bigImg.style.cssText = 'width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 16px;display:block;border:2px solid var(--border)';
+      fallback.parentNode.replaceChild(bigImg, fallback);
+    } else if (preview) {
+      preview.src = e.target.result;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,83 @@
+
+{% extends "base.html" %}
+{% block title %}Campus Clubs — ClubHub{% endblock %}
+{% block page_title %}Campus Clubs{% endblock %}
+ 
+{% block content %}
+<div class="info-page">
+ 
+  <div class="info-hero">
+    <div class="info-hero-icon">🎓</div>
+    <h1 class="info-hero-title">Built for Campus Clubs</h1>
+    <p class="info-hero-sub">Student clubs move fast — new members every semester, rotating leadership, and tight budgets. ClubHub gives campus clubs a simple, affordable system that anyone can pick up and run from day one.</p>
+  </div>
+ 
+  <div class="info-features-grid">
+    <div class="info-feature-card">
+      <div class="info-feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <h3>Fast member onboarding</h3>
+      <p>Add hundreds of new members at the start of each semester via CSV import or individual registration links.</p>
+    </div>
+    <div class="info-feature-card">
+      <div class="info-feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <h3>Meeting and event tracking</h3>
+      <p>Schedule club meetings, workshops, and social events. Track who came and send reminders to absentees.</p>
+    </div>
+    <div class="info-feature-card">
+      <div class="info-feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h3>Role handover made easy</h3>
+      <p>When leadership changes, transfer admin access in seconds. No data lost, no setup from scratch each year.</p>
+    </div>
+    <div class="info-feature-card">
+      <div class="info-feature-icon">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <h3>Membership fees</h3>
+      <p>Collect semester or annual registration fees. Track who has paid and follow up with members who haven't.</p>
+    </div>
+    <div class="info-feature-card">
+      <div class="info-feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <h3>Announcements</h3>
+      <p>Keep your whole club updated — from meeting reminders to competition results — with one-click announcements.</p>
+    </div>
+    <div class="info-feature-card">
+      <div class="info-feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      </div>
+      <h3>Activity reports</h3>
+      <p>Generate reports for your Student Union or university administration showing attendance and membership growth.</p>
+    </div>
+  </div>
+ 
+  <div class="info-stats-row">
+    <div class="info-stat">
+      <div class="info-stat-value">80+</div>
+      <div class="info-stat-label">Campus clubs onboarded</div>
+    </div>
+    <div class="info-stat">
+      <div class="info-stat-value">15,000+</div>
+      <div class="info-stat-label">Student members</div>
+    </div>
+    <div class="info-stat">
+      <div class="info-stat-value">Free</div>
+      <div class="info-stat-label">For clubs under 50 members</div>
+    </div>
+  </div>
+ 
+  <div class="info-cta-box">
+    <h2>Run your campus club without the spreadsheet chaos.</h2>
+    <p>Free for small clubs. Set up in an afternoon. No IT support needed.</p>
+    <a href="{{ url_for('admin.admin_dashboard') if session.get('role') == 'admin' else (url_for('member.member_dashboard') if session.get('user_id') else url_for('auth.register')) }}" class="btn btn-primary">{{ "Go to my dashboard" if session.get("user_id") else "Get started free" }}</a>
+  </div>
+ 
+</div>
+{% endblock %}
+ 

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: clubhub
+    env: python
+    buildCommand: pip install -r club_management/requirements.txt
+    startCommand: gunicorn -w 4 -b 0.0.0.0:$PORT "club_management:create_app()"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MYSQL_HOST
+        sync: false
+      - key: MYSQL_USER
+        sync: false
+      - key: MYSQL_PASSWORD
+        sync: false
+      - key: MYSQL_DB
+        sync: false

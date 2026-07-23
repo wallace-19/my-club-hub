@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClubHub — Club Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+ 
+  <!-- ══ Navbar ══════════════════════════════════════════════════ -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" width="32" height="32" alt="ClubHub">
+        <span>ClubHub</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="{{ url_for('auth.login') }}" class="btn-ghost-nav">Sign in</a>
+        <a href="{{ url_for('auth.register') }}" class="btn-primary-nav">Get started</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Open menu" onclick="toggleMobileMenu()">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="{{ url_for('auth.login') }}">Sign in</a>
+      <a href="{{ url_for('auth.register') }}" class="mobile-cta">Get started</a>
+    </div>
+  </nav>
+ 
+  <!-- ══ Hero ════════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <span class="hero-eyebrow">One system for every club operation</span>
+        <h1 class="hero-headline">
+          Run memberships,<br>
+          schedules, payments,<br>
+          and attendance<br>
+          <em>without the admin scramble.</em>
+        </h1>
+        <p class="hero-sub">
+          ClubHub brings sports clubs, private members clubs, campus groups,
+          and fitness studios into one calm operating dashboard — built
+          for staff, coaches, treasurers, and members.
+        </p>
+        <div class="hero-ctas">
+          <a href="{{ url_for('auth.register') }}" class="btn-primary-nav btn-lg-nav">
+            Get started free
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="#features" class="btn-outline-nav btn-lg-nav">Explore features</a>
+        </div>
+      </div>
+      <div class="hero-mockup" aria-hidden="true">
+        <div class="mockup-card">
+          <div class="mockup-topbar">
+            <div class="mockup-dots"><span></span><span></span><span></span></div>
+            <span class="mockup-label">Today · Nairobi</span>
+          </div>
+          <div class="mockup-stats-row">
+            <div class="mockup-stat">
+              <div class="mockup-stat-value">2,418</div>
+              <div class="mockup-stat-label">Active members across 8 club programs</div>
+            </div>
+            <div class="mockup-stat">
+              <div class="mockup-stat-value">96%</div>
+              <div class="mockup-stat-label">Dues collected before month close</div>
+            </div>
+          </div>
+          <div class="mockup-section-label">Live club schedule</div>
+          <div class="mockup-rows">
+            <div class="mockup-row">
+              <span class="mockup-row-name">Tennis ladder checkout</span>
+              <span class="mockup-pill green">42 attending</span>
+            </div>
+            <div class="mockup-row">
+              <span class="mockup-row-name">Campus athletics rowing</span>
+              <span class="mockup-pill gold">Room assigned</span>
+            </div>
+            <div class="mockup-row">
+              <span class="mockup-row-name">Board committee meeting</span>
+              <span class="mockup-pill muted">12 RSVP'd</span>
+            </div>
+          </div>
+          <div class="mockup-mini-row">
+            <div class="mockup-mini-bar"></div>
+            <div class="mockup-mini-bar short"></div>
+            <div class="mockup-mini-bar medium"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ══ Stats Banner ════════════════════════════════════════════ -->
+  <section class="stats-banner">
+    <div class="stats-banner-inner">
+      <div class="stat-item">
+        <div class="stat-number">500+</div>
+        <div class="stat-desc">Clubs onboarded</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-number">50,000+</div>
+        <div class="stat-desc">Active members</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-number">98%</div>
+        <div class="stat-desc">Satisfaction rate</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-number">KES 2M+</div>
+        <div class="stat-desc">Dues collected monthly</div>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ══ Who it's for ════════════════════════════════════════════ -->
+  <section class="who-section" id="who">
+    <div class="who-inner">
+      <div class="who-tabs">
+        <button class="who-tab active">🏅 Sports clubs</button>
+        <button class="who-tab">🏛️ Private members</button>
+        <button class="who-tab">🎓 Campus clubs</button>
+        <button class="who-tab">🏋️ Fitness studios</button>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ══ How it works ════════════════════════════════════════════ -->
+  <section class="how-section" id="how">
+    <div class="how-inner">
+      <p class="section-eyebrow">Simple by design</p>
+      <h2 class="section-headline">Up and running in minutes</h2>
+      <p class="section-sub">No training sessions, no IT team needed. ClubHub is built so any club operator can get started the same day.</p>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="how-step-number">01</div>
+          <div class="how-step-content">
+            <h3>Create your club</h3>
+            <p>Set up your club profile, define membership tiers, and configure your programs in under 10 minutes.</p>
+          </div>
+        </div>
+        <div class="how-connector"></div>
+        <div class="how-step">
+          <div class="how-step-number">02</div>
+          <div class="how-step-content">
+            <h3>Add your members</h3>
+            <p>Import existing member lists or invite members directly. Roles, permissions, and profiles are set automatically.</p>
+          </div>
+        </div>
+        <div class="how-connector"></div>
+        <div class="how-step">
+          <div class="how-step-number">03</div>
+          <div class="how-step-content">
+            <h3>Manage everything</h3>
+            <p>Track attendance, collect dues, publish schedules, and send announcements — all from one dashboard.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ══ Features ════════════════════════════════════════════════ -->
+  <section class="features-section" id="features">
+    <div class="features-inner">
+      <p class="features-eyebrow">Built for club operators</p>
+      <h2 class="features-headline">
+        Everything a club office needs,<br>without the spreadsheet sprawl.
+      </h2>
+      <p class="features-sub">
+        Keep the essentials close: member records, attendance, dues, events,
+        roles, and the signals that tell your team what needs attention today.
+      </p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>Member intelligence</h3>
+          <p>Profiles, tiers, waivers, guardians, roles, and activity history stay connected to one clean member record.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <h3>Schedules that stay live</h3>
+          <p>Publish sessions, assign rooms, track attendance, and let staff see changes as they happen.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <h3>Dues and payments clarity</h3>
+          <p>Know who has paid, who needs a reminder, and which programs are driving revenue this month.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          </div>
+          <h3>Reports and insights</h3>
+          <p>Attendance trends, dues collection rates, and membership growth — all in clear visual summaries.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <h3>Announcements and alerts</h3>
+          <p>Send targeted announcements to specific member groups, programs, or your entire club in seconds.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h3>Role-based access</h3>
+          <p>Admins, coaches, treasurers, and members each see exactly what they need — nothing more, nothing less.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ══ Testimonials ════════════════════════════════════════════ -->
+  <section class="testimonials-section" id="testimonials">
+    <div class="testimonials-inner">
+      <p class="section-eyebrow">What club operators say</p>
+      <h2 class="section-headline">Trusted by clubs across Kenya</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-quote">"ClubHub replaced three different spreadsheets we were juggling. Our treasurer now closes dues in two hours instead of two days."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">JM</div>
+            <div>
+              <div class="testimonial-name">James Mwangi</div>
+              <div class="testimonial-role">Chairman, Nairobi Athletics Club</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-quote">"The attendance tracking alone saved us hours every week. Members check in themselves and coaches see the list in real time."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">AO</div>
+            <div>
+              <div class="testimonial-name">Amina Odhiambo</div>
+              <div class="testimonial-role">Secretary, Westlands Tennis Club</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-quote">"We onboarded 200 campus club members in a single afternoon. The setup was surprisingly simple for something so powerful."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">BK</div>
+            <div>
+              <div class="testimonial-name">Brian Kamau</div>
+              <div class="testimonial-role">President, UoN Student Clubs Council</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ══ Pricing ═════════════════════════════════════════════════ -->
+  <section class="pricing-section" id="pricing">
+    <div class="pricing-inner">
+      <p class="section-eyebrow">Simple pricing</p>
+      <h2 class="section-headline">Plans that grow with your club</h2>
+      <p class="section-sub">Start free. Upgrade when you need more. No surprise charges.</p>
+      <div class="pricing-grid">
+ 
+        <div class="pricing-card">
+          <div class="pricing-tier">Free</div>
+          <div class="pricing-price">KES 0<span>/month</span></div>
+          <div class="pricing-desc">Perfect for small clubs just getting started.</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Up to 50 members</li>
+            <li><span class="check">✓</span> Basic attendance tracking</li>
+            <li><span class="check">✓</span> 1 admin account</li>
+            <li><span class="check">✓</span> Member profiles</li>
+            <li class="muted"><span>✗</span> Dues management</li>
+            <li class="muted"><span>✗</span> Reports & analytics</li>
+          </ul>
+          <a href="{{ url_for('auth.register') }}" class="btn-outline-nav" style="width:100%;justify-content:center;">Get started free</a>
+        </div>
+ 
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Most popular</div>
+          <div class="pricing-tier">Pro</div>
+          <div class="pricing-price">KES 2,500<span>/month</span></div>
+          <div class="pricing-desc">For growing clubs that need the full toolkit.</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Up to 500 members</li>
+            <li><span class="check">✓</span> Full attendance tracking</li>
+            <li><span class="check">✓</span> 5 admin accounts</li>
+            <li><span class="check">✓</span> Dues & payments</li>
+            <li><span class="check">✓</span> Reports & analytics</li>
+            <li><span class="check">✓</span> Announcements</li>
+          </ul>
+          <a href="{{ url_for('auth.register') }}" class="btn-primary-nav" style="width:100%;justify-content:center;">Start Pro trial</a>
+        </div>
+ 
+        <div class="pricing-card">
+          <div class="pricing-tier">Enterprise</div>
+          <div class="pricing-price">Custom<span>/month</span></div>
+          <div class="pricing-desc">For large organisations and multi-club federations.</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Unlimited members</li>
+            <li><span class="check">✓</span> Unlimited admins</li>
+            <li><span class="check">✓</span> Multi-club dashboard</li>
+            <li><span class="check">✓</span> Custom integrations</li>
+            <li><span class="check">✓</span> Dedicated support</li>
+            <li><span class="check">✓</span> SLA guarantee</li>
+          </ul>
+          <a href="#contact" class="btn-outline-nav" style="width:100%;justify-content:center;">Contact us</a>
+        </div>
+ 
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ══ FAQ ═════════════════════════════════════════════════════ -->
+  <section class="faq-section" id="faq">
+    <div class="faq-inner">
+      <p class="section-eyebrow">Got questions?</p>
+      <h2 class="section-headline">Frequently asked questions</h2>
+      <div class="faq-list">
+ 
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            How long does it take to set up ClubHub?
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            Most clubs are fully set up within a single afternoon. Creating your club, importing members, and configuring programs typically takes under two hours. No technical skills required.
+          </div>
+        </div>
+ 
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Can members access ClubHub on their phones?
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            Yes. ClubHub is fully responsive and works on any device — phone, tablet, or desktop. Members can check schedules, view their attendance, and receive announcements from anywhere.
+          </div>
+        </div>
+ 
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Can I migrate data from my existing spreadsheets?
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            Yes. ClubHub supports CSV import for member data. If you're on the Pro or Enterprise plan, our team can help you migrate your existing records at no extra cost.
+          </div>
+        </div>
+ 
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            How does dues collection work?
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            Admins set due amounts and deadlines per membership tier. ClubHub tracks who has paid, sends automatic reminders to members with outstanding dues, and gives the treasurer a real-time payment dashboard.
+          </div>
+        </div>
+ 
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Is my club's data secure?
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            Yes. All data is encrypted in transit and at rest. Role-based access means members only see their own information. Admins have full audit logs of all actions taken in the system.
+          </div>
+        </div>
+ 
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Can I cancel or change my plan at any time?
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            Yes. You can upgrade, downgrade, or cancel your plan at any time from your admin settings. There are no long-term contracts or cancellation fees.
+          </div>
+        </div>
+ 
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ══ CTA ═════════════════════════════════════════════════════ -->
+  <section class="cta-section" id="contact">
+    <div class="cta-inner">
+      <div class="cta-accent-line"></div>
+      <h2 class="cta-headline">See what a calmer club office feels like.</h2>
+      <p class="cta-sub">
+        Start with your members, programs, attendance, and dues —<br>
+        then add the workflows each club type needs as you grow.
+      </p>
+      <a href="{{ url_for('auth.register') }}" class="btn-primary-nav btn-lg-nav">
+        Get started free
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </section>
+ 
+  <!-- ══ Footer ══════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-inner">
+ 
+      <div class="footer-brand">
+        <a href="#" class="footer-logo">
+          <img src="{{ url_for('static', filename='images/logo.png') }}" width="28" height="28" alt="ClubHub">
+          ClubHub
+        </a>
+        <p class="footer-tagline">One system for every club operation. Built for club operators across Africa.</p>
+      </div>
+ 
+      <div class="footer-columns">
+        <div class="footer-col">
+          <div class="footer-col-title">Product</div>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#how">How it works</a></li>
+            <li><a href="{{ url_for('auth.register') }}">Get started</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Use cases</div>
+          <ul>
+            <li><a href="#who">Sports clubs</a></li>
+            <li><a href="#who">Private members</a></li>
+            <li><a href="#who">Campus clubs</a></li>
+            <li><a href="#who">Fitness studios</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Support</div>
+          <ul>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contact">Contact us</a></li>
+            <li><a href="{{ url_for('auth.login') }}">Sign in</a></li>
+          </ul>
+        </div>
+      </div>
+ 
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 ClubHub. All rights reserved.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy policy</a>
+        <a href="#">Terms of service</a>
+      </div>
+    </div>
+  </footer>
+ 
+  <script>
+    function toggleMobileMenu() {
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
+ 
+    document.querySelectorAll('.who-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.who-tab').forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+      });
+    });
+ 
+    function toggleFaq(btn) {
+      var item = btn.parentElement;
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
+      if (!isOpen) item.classList.add('open');
+    }
+  </script>
+</body>
+</html>

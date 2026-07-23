@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">Reports</h1>
+    <p class="section-subtitle">Export and analyse your club data</p>
+  </div>
+</div>
+
+<!-- Summary Stats -->
+<div class="stats-grid" style="margin-bottom:28px">
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+    <div class="stat-value">{{ active_members }}</div>
+    <div class="stat-label">Active Members</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+    <div class="stat-value">{{ pending_members }}</div>
+    <div class="stat-label">Pending Approvals</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    <div class="stat-value" style="color:var(--warning)">{{ renewals_due }}</div>
+    <div class="stat-label">Renewals Due (30d)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
+    <div class="stat-value">{{ event_stats|length }}</div>
+    <div class="stat-label">Events Tracked</div>
+  </div>
+</div>
+
+<!-- Export Cards -->
+<div class="dashboard-grid" style="margin-bottom:28px">
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Members Export</div>
+        <div class="card-subtitle">All member records with tier and renewal info</div>
+      </div>
+      <a href="{{ url_for('admin.export_members') }}" class="btn btn-primary btn-sm">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download CSV
+      </a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      <div class="text-sm text-muted">Includes: Name, Email, Phone, Program, Club Type, Membership Tier, Renewal Date, Status, Join Date</div>
+      {% if affiliation_stats %}
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-family:var(--font-mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Members by Program</div>
+        {% for a in affiliation_stats %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
+          <span class="text-sm">{{ a.club_affiliation }}</span>
+          <span class="font-mono" style="color:var(--gold);font-size:13px">{{ a.cnt }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Attendance Export</div>
+        <div class="card-subtitle">All marked attendance records by event</div>
+      </div>
+      <a href="{{ url_for('admin.export_attendance') }}" class="btn btn-primary btn-sm">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download CSV
+      </a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      <div class="text-sm text-muted">Includes: Event, Date, Location, Category, Member Name, Email, Program, Marked At</div>
+      {% if event_stats %}
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-family:var(--font-mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Event Attendance Summary</div>
+        {% for e in event_stats %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div class="text-sm" style="font-weight:500">{{ e.title }}</div>
+            <div class="text-muted" style="font-size:11px;font-family:var(--font-mono)">{{ e.event_date.strftime('%b %d, %Y') if e.event_date else '' }}</div>
+          </div>
+          <div style="text-align:right">
+            <span class="font-mono" style="color:var(--success);font-size:13px">{{ e.attended }} attended</span>
+            <span class="text-muted text-sm"> / {{ e.registered }} registered</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Renewals Export</div>
+        <div class="card-subtitle">Members with upcoming or overdue renewals</div>
+      </div>
+      <a href="{{ url_for('admin.export_renewals') }}" class="btn btn-primary btn-sm">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download CSV
+      </a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      <div class="text-sm text-muted">Includes: Name, Email, Phone, Program, Membership Tier, Renewal Date, Status</div>
+      {% if tier_stats %}
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-family:var(--font-mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Members by Tier</div>
+        {% for t in tier_stats %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
+          <span class="badge badge-upcoming">{{ t.membership_tier }}</span>
+          <span class="font-mono" style="color:var(--gold);font-size:13px">{{ t.cnt }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

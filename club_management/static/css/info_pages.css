@@ -1,0 +1,218 @@
+
+ 
+/* ── Sidebar section label ────────────────────────────────────── */
+.nav-section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 16px 14px 6px;
+  margin-top: 8px;
+}
+ 
+/* ── Info / marketing pages ───────────────────────────────────── */
+.info-page {
+  max-width: 960px;
+}
+ 
+.info-hero {
+  margin-bottom: 48px;
+}
+ 
+.info-hero-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+ 
+.info-hero-title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+ 
+.info-hero-sub {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.7;
+  max-width: 640px;
+}
+ 
+.info-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+ 
+.info-feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  transition: border-color .2s, transform .2s;
+}
+ 
+.info-feature-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-2px);
+}
+ 
+.info-feature-icon {
+  width: 40px; height: 40px;
+  background: var(--gold-dim);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+ 
+.info-feature-icon svg {
+  width: 18px; height: 18px;
+  stroke: var(--gold); fill: none;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+ 
+.info-feature-card h3 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+ 
+.info-feature-card p {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.65;
+}
+ 
+.info-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+ 
+.info-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+}
+ 
+.info-stat-value {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+ 
+.info-stat-label {
+  font-size: 12px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+ 
+.info-cta-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  text-align: center;
+  border-top: 3px solid var(--gold);
+}
+ 
+.info-cta-box h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+ 
+.info-cta-box p {
+  font-size: 14px;
+  color: var(--text-2);
+  margin-bottom: 24px;
+  line-height: 1.7;
+}
+ 
+/* ── Legal pages ──────────────────────────────────────────────── */
+.legal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 48px;
+}
+ 
+.legal-section {
+  padding: 28px 32px;
+  border-bottom: 1px solid var(--border);
+}
+ 
+.legal-section:last-child { border-bottom: none; }
+ 
+.legal-section h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+ 
+.legal-section p {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.75;
+  margin-bottom: 10px;
+}
+ 
+.legal-section p:last-child { margin-bottom: 0; }
+ 
+.legal-section ul {
+  margin: 10px 0 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+ 
+.legal-section ul li {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.65;
+}
+ 
+.legal-section strong {
+  color: var(--text);
+  font-weight: 500;
+}
+ 
+/* ── Responsive info pages ────────────────────────────────────── */
+@media (max-width: 900px) {
+  .info-features-grid { grid-template-columns: 1fr 1fr; }
+  .info-stats-row { grid-template-columns: 1fr 1fr; }
+}
+ 
+@media (max-width: 600px) {
+  .info-features-grid { grid-template-columns: 1fr; }
+  .info-stats-row { grid-template-columns: 1fr; }
+  .info-hero-title { font-size: 28px; }
+  .legal-section { padding: 20px; }
+  .info-cta-box { padding: 24px; }
+}
+ 
