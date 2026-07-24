@@ -16,7 +16,6 @@
 
 ClubHub is deployed as a live web application using Render and Gunicorn.
 
-> **Note:** The application may take a short time to respond if the hosting service has been inactive.
 
 ---
 
